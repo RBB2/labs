@@ -24,9 +24,17 @@ def find_ball(opencv_image, debug=False):
 	"""
 
 	ball = None
-	
-	## TODO: INSERT YOUR SOLUTION HERE
-	
+	#opencv_image = cv2.medianBlur(opencv_image , 5)
+	opencv_image = cv2.GaussianBlur(opencv_image, (5, 5), 0)
+	#circles = cv2.HoughCircles(opencv_image, cv2.HOUGH_GRADIENT, 1, 20,
+						   #param1=60, param2=35, minRadius=0, maxRadius=0)
+	circles = cv2.HoughCircles(opencv_image, cv2.HOUGH_GRADIENT, 1, 200,
+							   param1=99, param2=29, minRadius=0, maxRadius=0)
+	#circles = np.uint16(np.around(circles))
+
+	if circles is not None:
+		ball = circles[0][0]
+		#display_circles(opencv_image,circles[0])
 	return ball
 
 
@@ -46,16 +54,22 @@ def display_circles(opencv_image, circles, best=None):
 	#make a copy of the image to draw on
 	circle_image = copy.deepcopy(opencv_image)
 	circle_image = cv2.cvtColor(circle_image, cv2.COLOR_GRAY2RGB, circle_image)
-	
+	#print(circles)
 	for c in circles:
+
+		center = (c[0],c[1])
+		radius = c[2]
+		#print("center ", center)
+		#print("radius ", radius)
+
 		# draw the outer circle
-		cv2.circle(circle_image,(c[0],c[1]),c[2],(255,255,0),2)
+		cv2.circle(circle_image,center,radius,(255,255,0),2)
 		# draw the center of the circle
-		cv2.circle(circle_image,(c[0],c[1]),2,(0,255,255),3) 
+		cv2.circle(circle_image,center,2,(0,255,255),3)
 		# write coords
-		cv2.putText(circle_image,str(c),(c[0],c[1]),cv2.FONT_HERSHEY_SIMPLEX,
-					.5,(255,255,255),2,cv2.LINE_AA)            
-	
+		cv2.putText(circle_image,str(c),center,cv2.FONT_HERSHEY_SIMPLEX,
+					.5,(255,255,255),2,cv2.LINE_AA)
+
 	#highlight the best circle in a different color
 	if best is not None:
 		# draw the outer circle
@@ -64,7 +78,7 @@ def display_circles(opencv_image, circles, best=None):
 		cv2.circle(circle_image,(best[0],best[1]),2,(0,0,255),3) 
 		# write coords
 		cv2.putText(circle_image,str(best),(best[0],best[1]),cv2.FONT_HERSHEY_SIMPLEX,
-					.5,(255,255,255),2,cv2.LINE_AA)            
+					.5,(255,255,255),2,cv2.LINE_AA)
 		
 	
 	#display the image
